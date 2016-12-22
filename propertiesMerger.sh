@@ -26,27 +26,45 @@ OLD_FILE="./old.properties"
 while read -r current_line
 do
 
-    # Regex explain : ^(.*?)=(.*?)\s*$
+    # Regex explain : ^\s*([^#]*?)=(.*?)\s*$
     # 
-    #     ^(.*?)=             Catches everything from the begining until the first "=" (non greedy)
+    #     ^\s*                Ignore spaces from the begining of line
+    #     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
     #     (.*?)\s*$           Catches everything, til the end of line, "\s*" removes every final spaces
-
-    if [[ "$current_line" =~ ^(.*?)=(.*?)\s*$ ]];
+    # 
+    if [[ "$current_line" =~ ^\s*([^#]*?)=(.*?)\s*$ ]];
     then
-        
+
         current_key="${BASH_REMATCH[1]}";
         current_value="${BASH_REMATCH[2]}";
-        old_value=$(sed -n "/$current_key=/{s///; p;}" $OLD_FILE);
+        unset old_value
 
-        if [ "$old_value" != "" ];
+        # Fetching old value
+        # We're using the same Regex, to prevent old comments, and keep the last value of the file.
+
+        while read -r old_line
+        do
+            if [[ "$old_line" =~ ^\s*([^#]*?)=(.*?)\s*$ ]];
+            then
+                if [[ "${BASH_REMATCH[1]}" == $current_key ]]
+                then
+                    old_value="${BASH_REMATCH[2]}";
+                fi
+            fi
+        done < "$OLD_FILE"
+
+        # Printing result
+        # Checking if old value is set, to keep existing empty values ("")
+        
+        if [[ -z ${old_value+x} ]];
         then
-            echo "$current_key=$old_value";
-        else
             echo "$current_key=$current_value";
+        else
+            echo "$current_key=$old_value";
         fi
-    
+
     else
-        # Empty lines and comments
+        # Empty lines and comments are simply kept
         echo "$current_line";
     fi
 
