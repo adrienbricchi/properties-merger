@@ -23,6 +23,8 @@ SAMPLE_FILE="./sample.properties"
 OLD_FILE="./old.properties"
 
 
+# Merge files
+
 while read -r current_line
 do
 
@@ -44,12 +46,9 @@ do
 
         while read -r old_line
         do
-            if [[ "$old_line" =~ ^\s*([^#]*?)=(.*?)\s*$ ]];
+            if [[ "$old_line" =~ ^\s*([^#]*?)=(.*?)\s*$ ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
-                if [[ "${BASH_REMATCH[1]}" == $current_key ]]
-                then
-                    old_value="${BASH_REMATCH[2]}";
-                fi
+                old_value="${BASH_REMATCH[2]}";
             fi
         done < "$OLD_FILE"
 
