@@ -17,10 +17,65 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-#SAMPLE_FILE="$1"
-SAMPLE_FILE="./sample.properties"
-#OLD_FILE="$2"
-OLD_FILE="./old.properties"
+
+# Parse input
+
+while [[ $# -gt 1 ]]
+do
+    key="$1"
+
+    case $key in
+        -i|--input)
+            OLD_FILE="$2"
+            shift
+        ;;
+        -s|--sample)
+            SAMPLE_FILE="$2"
+            shift
+        ;;
+        -o|--output)
+            OUTPUT_FILE="$2"
+            shift
+        ;;
+        *)
+            echo "Error : Unknown argument : $1";
+            exit 1;
+        ;;
+    esac
+    shift
+done
+
+
+# Default cases
+
+if [[ ! -f $OLD_FILE ]];
+then
+    echo "Error : Input file does not exist.";
+    exit 1;
+fi
+
+if [[ ! -f $SAMPLE_FILE ]];
+then
+    echo "Error : Sample file does not exist.";
+    exit 1;
+fi
+
+if [[ $INPUT_FILE == $SAMPLE_FILE ]];
+then
+    echo "Error : Input and Sample files are the same. This is probably not what you want.";
+    exit 1;
+fi
+
+if [[ -f $OUTPUT_FILE ]];
+then
+    echo "Error : Output file already exists.";
+    exit 1;
+fi
+
+
+#echo "OLD = $OLD_FILE";
+#echo "SAM = $SAMPLE_FILE";
+#echo "OUT = $OUTPUT_FILE";
 
 
 # Merge files
