@@ -47,7 +47,7 @@ do
         -t|--test)
             TEST_MODE=true
         ;;
-        --no-color)
+        --no-color|--no-colour)
             YELLOW=''
             LIGHT_RED=''
             LIGHT_GREY=''
@@ -116,11 +116,11 @@ then
    echo -e "              If not set, results will be print on the standard output."
    echo -e ""
    echo -e "       ${BOLD}-t$STD, ${BOLD}--test$STD"
-   echo -e "              The test mode, with color emphasis on merged data."
+   echo -e "              The test mode, with emphasis on merged data."
    echo -e "              This mode will invalidate the -o option."
    echo -e ""
-   echo -e "       ${BOLD}--no-color$STD"
-   echo -e "              Disables colors on test mode."
+   echo -e "       ${BOLD}--no-color$STD, ${BOLD}--no-colour$STD"
+   echo -e "              Disables colours on test mode."
    echo -e ""
    echo -e "       ${BOLD}--help$STD"
    echo -e "              Ignore every other input, and displays this help."
@@ -142,9 +142,9 @@ then
     echo -e "${LIGHT_GREY}#                             TEST MODE                                        #$STD"
     echo -e "${LIGHT_GREY}#                                                                              #$STD"
     echo -e "${LIGHT_GREY}# This output contains a bunch of coloured chars,                              #$STD"
-    echo -e "${LIGHT_GREY}# Avoid redirecting the output in a real property file..                       #$STD"
+    echo -e "${LIGHT_GREY}# Avoid redirecting the output in a real .properties file.                     #$STD"
     echo -e "${LIGHT_GREY}#                                                                              #$STD"
-    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines$LIGHT_GREY are parameters from the old file                                #$STD"
+    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines$LIGHT_GREY are parameters from the existing file                           #$STD"
     echo -e "${LIGHT_GREY}# ${STD}Regular lines$LIGHT_GREY are parameters from the sample file                            #$STD"
     echo -e "${LIGHT_GREY}################################################################################$STD"
     unset OUTPUT_FILE
@@ -185,17 +185,32 @@ do
         
         if [[ -z ${old_value+x} ]];
         then
-            echo "$current_key=$current_value"
+            if [[ -z ${OUTPUT_FILE+x} ]];
+            then
+                echo "$current_key=$current_value"
+            else
+                echo "$current_key=$current_value" >> $OUTPUT_FILE
+            fi
         elif [[ $TEST_MODE == true ]]
         then
             echo -e "$YELLOW$current_key=$old_value$STD"
         else
-            echo "$current_key=$old_value"
+            if [[ -z ${OUTPUT_FILE+x} ]];
+            then
+                echo "$current_key=$old_value"
+            else
+                echo "$current_key=$old_value" >> $OUTPUT_FILE
+            fi
         fi
 
     else
         # Empty lines and comments are simply kept
-        echo "$current_line"
+        if [[ -z ${OUTPUT_FILE+x} ]];
+        then
+            echo "$current_line"
+        else
+            echo "$current_line" >> $OUTPUT_FILE
+        fi
     fi
 
 done < "$SAMPLE_FILE"
