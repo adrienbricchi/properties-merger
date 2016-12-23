@@ -45,6 +45,12 @@ do
         -t|--test)
             TEST_MODE=$true
         ;;
+        --no-color)
+            YELLOW=''
+            LIGHT_RED=''
+            LIGHT_GREY=''
+            NO_COLOR=''
+        ;;
         *)
             echo -e "${LIGHT_RED}Error : Unknown argument : $1$NO_COLOR"
             exit 1
