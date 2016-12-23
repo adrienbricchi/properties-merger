@@ -24,7 +24,7 @@ NO_COLOR='\033[0m'
 
 # Parse input
 
-TEST_MODE=$false
+TEST_MODE=false
 
 while [[ $# -gt 0 ]]
 do
@@ -43,7 +43,7 @@ do
             shift
         ;;
         -t|--test)
-            TEST_MODE=$true
+            TEST_MODE=true
         ;;
         --no-color)
             YELLOW=''
@@ -62,7 +62,31 @@ done
 
 # Safety checks
 
-if [[ $TEST_MODE == $true ]];
+if [[ ! -f $OLD_FILE ]];
+then
+    echo -e "${LIGHT_RED}Error : Input file does not exist.$NO_COLOR"
+    exit 2
+fi
+
+if [[ ! -f $SAMPLE_FILE ]];
+then
+    echo -e "${LIGHT_RED}Error : Sample file does not exist.$NO_COLOR"
+    exit 3
+fi
+
+if [[ $INPUT_FILE == $SAMPLE_FILE ]];
+then
+    echo -e "${LIGHT_RED}Error : Input and Sample files are the same. This is probably not what you want.$NO_COLOR"
+    exit 4
+fi
+
+if [[ -f $OUTPUT_FILE ]];
+then
+    echo -e "${LIGHT_RED}Error : Output file already exists.$NO_COLOR"
+    exit 5
+fi
+
+if [[ $TEST_MODE == true ]];
 then
     echo -e "${LIGHT_GREY}################################################################################$NO_COLOR"
     echo -e "${LIGHT_GREY}#                             TEST MODE                                        #$NO_COLOR"
@@ -70,34 +94,10 @@ then
     echo -e "${LIGHT_GREY}# This output contains a bunch of coloured chars,                              #$NO_COLOR"
     echo -e "${LIGHT_GREY}# Avoid redirecting the output in a real property file..                       #$NO_COLOR"
     echo -e "${LIGHT_GREY}#                                                                              #$NO_COLOR"
-    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines are parameters from the old file                                $LIGHT_GREY#$NO_COLOR"
-    echo -e "${LIGHT_GREY}# ${NO_COLOR}Regular lines are parameters from the sample file                            $LIGHT_GREY#$NO_COLOR"
+    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines$LIGHT_GREY are parameters from the old file                                #$NO_COLOR"
+    echo -e "${LIGHT_GREY}# ${NO_COLOR}Regular lines$LIGHT_GREY are parameters from the sample file                            #$NO_COLOR"
     echo -e "${LIGHT_GREY}################################################################################$NO_COLOR"
     unset OUTPUT_FILE
-fi
-
-if [[ ! -f $OLD_FILE ]];
-then
-    echo -e "${LIGHT_RED}Error : Input file does not exist.$NO_COLOR"
-    exit 1
-fi
-
-if [[ ! -f $SAMPLE_FILE ]];
-then
-    echo -e "${LIGHT_RED}Error : Sample file does not exist.$NO_COLOR"
-    exit 1
-fi
-
-if [[ $INPUT_FILE == $SAMPLE_FILE ]];
-then
-    echo -e "${LIGHT_RED}Error : Input and Sample files are the same. This is probably not what you want.$NO_COLOR"
-    exit 1
-fi
-
-if [[ -f $OUTPUT_FILE ]];
-then
-    echo -e "${LIGHT_RED}Error : Output file already exists.$NO_COLOR"
-    exit 1
 fi
 
 
@@ -136,7 +136,7 @@ do
         if [[ -z ${old_value+x} ]];
         then
             echo "$current_key=$current_value"
-        elif [[ $TEST_MODE == $true ]];
+        elif [[ $TEST_MODE == true ]]
         then
             echo -e "$YELLOW$current_key=$old_value$NO_COLOR"
         else
