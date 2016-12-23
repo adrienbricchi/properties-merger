@@ -17,11 +17,15 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+VERSION_NUMBER=1
+VERSION_DATE="2016/12/23"
+
 YELLOW='\033[1;33m'
 LIGHT_RED='\033[1;31m'
 LIGHT_GREY='\033[1;30m'
 BOLD='\033[1m'
 STD='\033[0m'
+
 
 # Parse input
 
@@ -53,11 +57,62 @@ do
             LIGHT_GREY=''
             STD=''
         ;;
-        --help)
-            HELP=true
+        -v|--version)
+            echo $VERSION_NUMBER
+            exit 0
+        ;;
+        -h|--help)
+            echo -e "${BOLD}NAME${STD}"
+            echo -e "       properties-merger - merge a sample .properties file with already existing values"
+            echo -e ""
+            echo -e "${BOLD}SYNOPSIS${STD}"
+            echo -e "       ./properties-merger.sh -i my.properties.old -s my.properties.sample [OPTIONS]"
+            echo -e ""
+            echo -e "${BOLD}DESCRIPTION${STD}"
+            echo -e ""
+            echo -e "       Mandatory arguments :"
+            echo -e ""
+            echo -e "       ${BOLD}-i${STD}, ${BOLD}--input${STD}"
+            echo -e "              The input file, where existing data will be fetch."
+            echo -e ""
+            echo -e "       ${BOLD}-s${STD}, ${BOLD}--sample${STD}"
+            echo -e "              The sample property file. The output model will be based on this one."
+            echo -e ""
+            echo -e "       Optional arguments :"
+            echo -e ""
+            echo -e "       ${BOLD}-o${STD}, ${BOLD}--output${STD}"
+            echo -e "              The output file path. The file should not exists, or an error will be returned."
+            echo -e "              If not set, results will be print on the standard output."
+            echo -e ""
+            echo -e "       ${BOLD}-t${STD}, ${BOLD}--test${STD}"
+            echo -e "              The test mode, with emphasis on merged data."
+            echo -e "              This mode will invalidate the -o option."
+            echo -e ""
+            echo -e "       ${BOLD}--no-color${STD}, ${BOLD}--no-colour${STD}"
+            echo -e "              Disables colours on test mode."
+            echo -e ""
+            echo -e "       ${BOLD}-h${STD}, ${BOLD}--help${STD}"
+            echo -e "              Displays this help."
+            echo -e ""
+            echo -e "       ${BOLD}-v${STD}, ${BOLD}--version${STD}"
+            echo -e "              Displays the current (int) version."
+            echo -e ""
+            echo -e "${BOLD}AUTHOR${STD}"
+            echo -e "       Written by Adrien Bricchi"
+            echo -e ""
+            echo -e "${BOLD}COPYRIGHT${STD}"
+            echo -e "       Copyright © 2017 Libriciel.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>."
+            echo -e "       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law."
+            echo -e ""
+            echo -e "${BOLD}VERSION${STD}"
+            echo -e "       v.${VERSION_NUMBER} (${VERSION_DATE})"
+            echo -e ""
+
+            exit 0
         ;;
         *)
-            echo -e "${LIGHT_RED}Error : Unknown argument : $1$STD"
+            echo -e "${LIGHT_RED}Error : Unknown argument : $1${STD}"
+            echo -e "Use --help argument for the list of parameters"
             exit 1
         ;;
     esac
@@ -69,84 +124,39 @@ done
 
 if [[ ! -f $OLD_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input file does not exist.$STD"
+    echo -e "${LIGHT_RED}Error : Input file does not exist.${STD}"
     exit 2
 fi
 
 if [[ ! -f $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Sample file does not exist.$STD"
+    echo -e "${LIGHT_RED}Error : Sample file does not exist.${STD}"
     exit 3
 fi
 
 if [[ $INPUT_FILE == $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input and Sample files are the same. This is probably not what you want.$STD"
+    echo -e "${LIGHT_RED}Error : Input and Sample files are the same. This is probably not what you want.${STD}"
     exit 4
 fi
 
 if [[ -f $OUTPUT_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Output file already exists.$STD"
+    echo -e "${LIGHT_RED}Error : Output file already exists.${STD}"
     exit 5
-fi
-
-if [[ $HELP == true ]];
-then
-   echo -e "${BOLD}NAME$STD"
-   echo -e "       properties-merger - merge a sample .properties file with already existing values"
-   echo -e ""
-   echo -e "${BOLD}SYNOPSIS$STD"
-   echo -e "       ./properties-merger.sh -i my.properties.old -s my.properties.sample [OPTIONS]"
-   echo -e ""
-   echo -e "${BOLD}DESCRIPTION$STD"
-   echo -e ""
-   echo -e "       Mandatory arguments :"
-   echo -e ""
-   echo -e "       ${BOLD}-i$STD, ${BOLD}--input$STD"
-   echo -e "              The input file, where existing data will be fetch."
-   echo -e ""
-   echo -e "       ${BOLD}-s$STD, ${BOLD}--sample$STD"
-   echo -e "              The sample property file. The output model will be based on this one."
-   echo -e ""
-   echo -e "       Optional arguments :"
-   echo -e ""
-   echo -e "       ${BOLD}-o$STD, ${BOLD}--output$STD"
-   echo -e "              The output file path. The file should not exists, or an error will be returned."
-   echo -e "              If not set, results will be print on the standard output."
-   echo -e ""
-   echo -e "       ${BOLD}-t$STD, ${BOLD}--test$STD"
-   echo -e "              The test mode, with emphasis on merged data."
-   echo -e "              This mode will invalidate the -o option."
-   echo -e ""
-   echo -e "       ${BOLD}--no-color$STD, ${BOLD}--no-colour$STD"
-   echo -e "              Disables colours on test mode."
-   echo -e ""
-   echo -e "       ${BOLD}--help$STD"
-   echo -e "              Ignore every other input, and displays this help."
-   echo -e ""
-   echo -e "${BOLD}AUTHOR$STD"
-   echo -e "       Written by Adrien Bricchi"
-   echo -e ""
-   echo -e "${BOLD}COPYRIGHT$STD"
-   echo -e "       Copyright © 2017 Libriciel.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>."
-   echo -e "       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law."
-   echo -e ""
-
-   exit 0
 fi
 
 if [[ $TEST_MODE == true ]];
 then
-    echo -e "${LIGHT_GREY}################################################################################$STD"
-    echo -e "${LIGHT_GREY}#                             TEST MODE                                        #$STD"
-    echo -e "${LIGHT_GREY}#                                                                              #$STD"
-    echo -e "${LIGHT_GREY}# This output contains a bunch of coloured chars,                              #$STD"
-    echo -e "${LIGHT_GREY}# Avoid redirecting the output in a real .properties file.                     #$STD"
-    echo -e "${LIGHT_GREY}#                                                                              #$STD"
-    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines$LIGHT_GREY are parameters from the existing file                           #$STD"
-    echo -e "${LIGHT_GREY}# ${STD}Regular lines$LIGHT_GREY are parameters from the sample file                            #$STD"
-    echo -e "${LIGHT_GREY}################################################################################$STD"
+    echo -e "${LIGHT_GREY}################################################################################${STD}"
+    echo -e "${LIGHT_GREY}#                             TEST MODE                                        #${STD}"
+    echo -e "${LIGHT_GREY}#                                                                              #${STD}"
+    echo -e "${LIGHT_GREY}# This output contains a bunch of coloured chars,                              #${STD}"
+    echo -e "${LIGHT_GREY}# Avoid redirecting the output in a real .properties file.                     #${STD}"
+    echo -e "${LIGHT_GREY}#                                                                              #${STD}"
+    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines${LIGHT_GREY} are parameters from the existing file                           #${STD}"
+    echo -e "${LIGHT_GREY}# ${STD}Regular lines${LIGHT_GREY} are parameters from the sample file                            #${STD}"
+    echo -e "${LIGHT_GREY}################################################################################${STD}"
     unset OUTPUT_FILE
 fi
 
@@ -162,7 +172,7 @@ do
     #     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
     #     (.*?)\s*$           Catches everything, til the end of line, "\s*" removes every final spaces
     # 
-    if [[ "$current_line" =~ ^\s*([^#]*?)=(.*?)\s*$ ]];
+    if [[ "${current_line}" =~ ^\s*([^#]*?)=(.*?)\s*$ ]];
     then
 
         current_key="${BASH_REMATCH[1]}"
@@ -174,11 +184,11 @@ do
 
         while read -r old_line
         do
-            if [[ "$old_line" =~ ^\s*([^#]*?)=(.*?)\s*$ ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+            if [[ "${old_line}" =~ ^\s*([^#]*?)=(.*?)\s*$ ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
                 old_value="${BASH_REMATCH[2]}"
             fi
-        done < "$OLD_FILE"
+        done < "${OLD_FILE}"
 
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
@@ -187,19 +197,19 @@ do
         then
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
-                echo "$current_key=$current_value"
+                echo "${current_key}=${current_value}"
             else
-                echo "$current_key=$current_value" >> $OUTPUT_FILE
+                echo "${current_key}=${current_value}" >> $OUTPUT_FILE
             fi
         elif [[ $TEST_MODE == true ]]
         then
-            echo -e "$YELLOW$current_key=$old_value$STD"
+            echo -e "${YELLOW}${current_key}=${old_value}${STD}"
         else
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
-                echo "$current_key=$old_value"
+                echo "${current_key}=${old_value}"
             else
-                echo "$current_key=$old_value" >> $OUTPUT_FILE
+                echo "${current_key}=${old_value}" >> $OUTPUT_FILE
             fi
         fi
 
@@ -207,11 +217,11 @@ do
         # Empty lines and comments are simply kept
         if [[ -z ${OUTPUT_FILE+x} ]];
         then
-            echo "$current_line"
+            echo "${current_line}"
         else
-            echo "$current_line" >> $OUTPUT_FILE
+            echo "${current_line}" >> $OUTPUT_FILE
         fi
     fi
 
-done < "$SAMPLE_FILE"
+done < "${SAMPLE_FILE}"
 
