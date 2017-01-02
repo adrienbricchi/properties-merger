@@ -124,13 +124,13 @@ done
 
 if [[ ! -f $OLD_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input file does not exist.${STD}"
+    echo -e "${LIGHT_RED}Error : Input file (--input) does not exist.${STD}"
     exit 2
 fi
 
 if [[ ! -f $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Sample file does not exist.${STD}"
+    echo -e "${LIGHT_RED}Error : Sample file (--sample) does not exist.${STD}"
     exit 3
 fi
 
@@ -180,7 +180,7 @@ do
         unset old_value
 
         # Fetching old value
-        # We're using the same Regex, to prevent old comments, and keep the last value of the file.
+        # We're using the same Regex, to prevent old comments.
 
         while read -r old_line
         do
