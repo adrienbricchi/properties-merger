@@ -20,10 +20,10 @@
 VERSION_NUMBER=3
 VERSION_DATE="2017/01/02"
 
-LIGHT_GREEN='\033[1;32m'
-LIGHT_RED='\033[1;31m'
+GRAY='\033[1;30m'
+RED='\033[1;31m'
+GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
-LIGHT_GREY='\033[1;30m'
 BOLD='\033[1m'
 STD='\033[0m'
 
@@ -32,13 +32,14 @@ STD='\033[0m'
 
 TEST_MODE=false
 HELP=false
+APPEND_DELETED_VALUES=false
 
 while [[ $# -gt 0 ]]
 do
     key="$1"
     case $key in
         -i|--input)
-            OLD_FILE="$2"
+            INPUT_FILE="$2"
             shift
         ;;
         -s|--sample)
@@ -52,10 +53,15 @@ do
         -t|--test)
             TEST_MODE=true
         ;;
+        -a|--append-deleted-values)
+            APPEND_DELETED_VALUES=true
+        ;;
         --no-color|--no-colour)
+            GRAY=''
+            RED=''
+            GREEN=''
             YELLOW=''
-            LIGHT_RED=''
-            LIGHT_GREY=''
+            BOLD=''
             STD=''
         ;;
         -v|--version)
@@ -89,6 +95,10 @@ do
             echo -e "              The test mode, with emphasis on merged data."
             echo -e "              This mode will invalidate the -o option."
             echo -e ""
+            echo -e "       ${BOLD}-a${STD}, ${BOLD}--append-deleted-values${STD}"
+            echo -e "              Adds the unknown keys from the input file at the end of the output."
+            echo -e "              This mode is activated automatically on test mode"
+            echo -e ""
             echo -e "       ${BOLD}--no-color${STD}, ${BOLD}--no-colour${STD}"
             echo -e "              Disables colours on test mode."
             echo -e ""
@@ -112,7 +122,7 @@ do
             exit 0
         ;;
         *)
-            echo -e "${LIGHT_RED}Error : Unknown argument : $1${STD}"
+            echo -e "${RED}Error : Unknown argument : $1${STD}"
             echo -e "Use --help argument for the list of parameters"
             exit 1
         ;;
@@ -123,33 +133,34 @@ done
 
 # Safety checks
 
-if [[ ! -f $OLD_FILE ]];
+if [[ ! -f $INPUT_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input file (--input) does not exist.${STD}"
+    echo -e "${RED}Error : Input file (--input) does not exist.${STD}"
     exit 2
 fi
 
 if [[ ! -f $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Sample file (--sample) does not exist.${STD}"
+    echo -e "${RED}Error : Sample file (--sample) does not exist.${STD}"
     exit 3
 fi
 
 if [[ $INPUT_FILE == $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input and Sample files are the same. This is probably not what you want.${STD}"
+    echo -e "${RED}Error : Input and Sample files are the same. This is probably not what you want.${STD}"
     exit 4
 fi
 
 if [[ -f $OUTPUT_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Output file already exists.${STD}"
+    echo -e "${RED}Error : Output file already exists.${STD}"
     exit 5
 fi
 
 if [[ $TEST_MODE == true ]];
 then
     unset OUTPUT_FILE
+    APPEND_DELETED_VALUES=true
 fi
 
 
@@ -170,31 +181,31 @@ do
 
         current_key="${BASH_REMATCH[1]}"
         current_value="${BASH_REMATCH[2]}"
-        unset old_value
+        unset input_value
 
         # Fetching old value
         # We're using the same Regex, to prevent old comments.
 
-        while read -r old_line
+        while read -r input_line
         do
-            if [[ "${old_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+            if [[ "${input_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
-                old_value="${BASH_REMATCH[2]}"
+                input_value="${BASH_REMATCH[2]}"
             fi
-        done < "${OLD_FILE}"
+        done < "${INPUT_FILE}"
 
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
         
-        if [[ $TEST_MODE == true ]]
+        if [[ $TEST_MODE == true ]];
         then
-            if [[ -z ${old_value+x} ]];
+            if [[ -z ${input_value+x} ]];
             then
-                echo -e "[${YELLOW}SAMPLE${STD}]  ${current_key}=${current_value}"
+                echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}"
             else
-                echo -e "[${LIGHT_GREEN}INPUT${STD}]   ${current_key}=${old_value}"
+                echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}"
             fi
-        elif [[ -z ${old_value+x} ]];
+        elif [[ -z ${input_value+x} ]];
         then
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
@@ -205,9 +216,9 @@ do
         else
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
-                echo "${current_key}=${old_value}"
+                echo "${current_key}=${input_value}"
             else
-                echo "${current_key}=${old_value}" >> $OUTPUT_FILE
+                echo "${current_key}=${input_value}" >> $OUTPUT_FILE
             fi
         fi
 
@@ -216,7 +227,7 @@ do
 
         if [[ $TEST_MODE == true ]]
         then
-            echo "[COMMENT] ${current_line}"
+            echo -e "[${GRAY}COMMENT${STD}] ${current_line}"
         elif [[ -z ${OUTPUT_FILE+x} ]];
         then
             echo "${current_line}"
@@ -230,12 +241,11 @@ done < "${SAMPLE_FILE}"
 
 # Printing deleted values
 
-if [[ $TEST_MODE == true ]]
+if [[ $APPEND_DELETED_VALUES == true ]];
 then
-    while read -r old_line
+    while read -r input_line
     do
-
-        if [[ "${old_line}" =~ $PROPERTIES_REGEX ]];
+        if [[ "${input_line}" =~ $PROPERTIES_REGEX ]];
         then
             current_key="${BASH_REMATCH[1]}"
             current_value="${BASH_REMATCH[2]}"
@@ -251,9 +261,17 @@ then
 
             if [[ $key_exists_in_sample == false ]];
             then
-                echo -e "[${LIGHT_RED}DELETED${STD}] ${current_key}=${current_value}"
+                if [[ $TEST_MODE == true ]];
+                then
+                    echo -e "[${RED}DELETED${STD}] ${current_key}=${current_value}"
+                elif [[ -z ${OUTPUT_FILE+x} ]];
+                then
+                    echo "${current_key}=${current_value}"
+                else
+                    echo "${current_key}=${current_value}" >> $OUTPUT_FILE
+                fi
             fi
         fi
-    done < "${OLD_FILE}"
+    done < "${INPUT_FILE}"
 fi
 
