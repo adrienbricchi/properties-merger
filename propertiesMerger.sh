@@ -20,8 +20,9 @@
 VERSION_NUMBER=2
 VERSION_DATE="2017/01/02"
 
-YELLOW='\033[1;33m'
+LIGHT_GREEN='\033[1;32m'
 LIGHT_RED='\033[1;31m'
+YELLOW='\033[1;33m'
 LIGHT_GREY='\033[1;30m'
 BOLD='\033[1m'
 STD='\033[0m'
@@ -124,13 +125,13 @@ done
 
 if [[ ! -f $OLD_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input file does not exist.${STD}"
+    echo -e "${LIGHT_RED}Error : Input file (--input) does not exist.${STD}"
     exit 2
 fi
 
 if [[ ! -f $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Sample file does not exist.${STD}"
+    echo -e "${LIGHT_RED}Error : Sample file (--sample) does not exist.${STD}"
     exit 3
 fi
 
@@ -148,31 +149,23 @@ fi
 
 if [[ $TEST_MODE == true ]];
 then
-    echo -e "${LIGHT_GREY}################################################################################${STD}"
-    echo -e "${LIGHT_GREY}#                             TEST MODE                                        #${STD}"
-    echo -e "${LIGHT_GREY}#                                                                              #${STD}"
-    echo -e "${LIGHT_GREY}# This output contains a bunch of coloured chars,                              #${STD}"
-    echo -e "${LIGHT_GREY}# Avoid redirecting the output in a real .properties file.                     #${STD}"
-    echo -e "${LIGHT_GREY}#                                                                              #${STD}"
-    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines${LIGHT_GREY} are parameters from the existing file                           #${STD}"
-    echo -e "${LIGHT_GREY}# ${STD}Regular lines${LIGHT_GREY} are parameters from the sample file                            #${STD}"
-    echo -e "${LIGHT_GREY}################################################################################${STD}"
     unset OUTPUT_FILE
 fi
 
 
 # Merge files
 
+# Regex explain : ^\s*([^#]*?)=(.*?)\s*$
+# 
+#     ^\s*                Ignore spaces from the begining of line
+#     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
+#     (.*?)\s*$           Catches everything, til the end of line, "\s*" removes every final spaces
+# 
+PROPERTIES_REGEX="^\s*([^#]*?)=(.*?)\s*$"
+
 while read -r current_line
 do
-
-    # Regex explain : ^\s*([^#]*?)=(.*?)\s*$
-    # 
-    #     ^\s*                Ignore spaces from the begining of line
-    #     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
-    #     (.*?)\s*$           Catches everything, til the end of line, "\s*" removes every final spaces
-    # 
-    if [[ "${current_line}" =~ ^\s*([^#]*?)=(.*?)\s*$ ]];
+    if [[ "${current_line}" =~ $PROPERTIES_REGEX ]];
     then
 
         current_key="${BASH_REMATCH[1]}"
@@ -180,11 +173,11 @@ do
         unset old_value
 
         # Fetching old value
-        # We're using the same Regex, to prevent old comments, and keep the last value of the file.
+        # We're using the same Regex, to prevent old comments.
 
         while read -r old_line
         do
-            if [[ "${old_line}" =~ ^\s*([^#]*?)=(.*?)\s*$ ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+            if [[ "${old_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
                 old_value="${BASH_REMATCH[2]}"
             fi
@@ -193,7 +186,15 @@ do
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
         
-        if [[ -z ${old_value+x} ]];
+        if [[ $TEST_MODE == true ]]
+        then
+            if [[ -z ${old_value+x} ]];
+            then
+                echo -e "[${YELLOW}SAMPLE${STD}]  ${current_key}=${current_value}"
+            else
+                echo -e "[${LIGHT_GREEN}INPUT${STD}]   ${current_key}=${old_value}"
+            fi
+        elif [[ -z ${old_value+x} ]];
         then
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
@@ -201,9 +202,6 @@ do
             else
                 echo "${current_key}=${current_value}" >> $OUTPUT_FILE
             fi
-        elif [[ $TEST_MODE == true ]]
-        then
-            echo -e "${YELLOW}${current_key}=${old_value}${STD}"
         else
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
@@ -215,7 +213,11 @@ do
 
     else
         # Empty lines and comments are simply kept
-        if [[ -z ${OUTPUT_FILE+x} ]];
+
+        if [[ $TEST_MODE == true ]]
+        then
+            echo "[COMMENT] ${current_line}"
+        elif [[ -z ${OUTPUT_FILE+x} ]];
         then
             echo "${current_line}"
         else
@@ -224,4 +226,34 @@ do
     fi
 
 done < "${SAMPLE_FILE}"
+
+
+# Printing deleted values
+
+if [[ $TEST_MODE == true ]]
+then
+    while read -r old_line
+    do
+
+        if [[ "${old_line}" =~ $PROPERTIES_REGEX ]];
+        then
+            current_key="${BASH_REMATCH[1]}"
+            current_value="${BASH_REMATCH[2]}"
+            key_exists_in_sample=false
+
+            while read -r sample_line
+            do
+                if [[ "${sample_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+                then
+                    key_exists_in_sample=true
+                fi
+            done < "${SAMPLE_FILE}"
+
+            if [[ $key_exists_in_sample == false ]];
+            then
+                echo -e "[${LIGHT_RED}DELETED${STD}] ${current_key}=${current_value}"
+            fi
+        fi
+    done < "${OLD_FILE}"
+fi
 
