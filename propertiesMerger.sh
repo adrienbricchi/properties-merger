@@ -20,10 +20,9 @@
 VERSION_NUMBER=1
 VERSION_DATE="2016/12/23"
 
-LIGHT_GREEN='\033[1;32m'
-LIGHT_RED='\033[1;31m'
+GREEN='\033[1;32m'
+RED='\033[1;31m'
 YELLOW='\033[1;33m'
-LIGHT_GREY='\033[1;30m'
 BOLD='\033[1m'
 STD='\033[0m'
 
@@ -53,9 +52,10 @@ do
             TEST_MODE=true
         ;;
         --no-color|--no-colour)
+            GREEN=''
+            RED=''
             YELLOW=''
-            LIGHT_RED=''
-            LIGHT_GREY=''
+            BOLD=''
             STD=''
         ;;
         -v|--version)
@@ -112,7 +112,7 @@ do
             exit 0
         ;;
         *)
-            echo -e "${LIGHT_RED}Error : Unknown argument : $1${STD}"
+            echo -e "${RED}Error : Unknown argument : $1${STD}"
             echo -e "Use --help argument for the list of parameters"
             exit 1
         ;;
@@ -125,25 +125,25 @@ done
 
 if [[ ! -f $OLD_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input file (--input) does not exist.${STD}"
+    echo -e "${RED}Error : Input file (--input) does not exist.${STD}"
     exit 2
 fi
 
 if [[ ! -f $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Sample file (--sample) does not exist.${STD}"
+    echo -e "${RED}Error : Sample file (--sample) does not exist.${STD}"
     exit 3
 fi
 
 if [[ $INPUT_FILE == $SAMPLE_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Input and Sample files are the same. This is probably not what you want.${STD}"
+    echo -e "${RED}Error : Input and Sample files are the same. This is probably not what you want.${STD}"
     exit 4
 fi
 
 if [[ -f $OUTPUT_FILE ]];
 then
-    echo -e "${LIGHT_RED}Error : Output file already exists.${STD}"
+    echo -e "${RED}Error : Output file already exists.${STD}"
     exit 5
 fi
 
@@ -192,7 +192,7 @@ do
             then
                 echo -e "[${YELLOW}SAMPLE${STD}]  ${current_key}=${current_value}"
             else
-                echo -e "[${LIGHT_GREEN}INPUT${STD}]   ${current_key}=${old_value}"
+                echo -e "[${GREEN}INPUT${STD}]   ${current_key}=${old_value}"
             fi
         elif [[ -z ${old_value+x} ]];
         then
@@ -216,7 +216,7 @@ do
 
         if [[ $TEST_MODE == true ]]
         then
-            echo "[COMMENT] ${current_line}"
+            echo -e "[${BOLD}COMMENT${STD}] ${current_line}"
         elif [[ -z ${OUTPUT_FILE+x} ]];
         then
             echo "${current_line}"
@@ -251,7 +251,7 @@ then
 
             if [[ $key_exists_in_sample == false ]];
             then
-                echo -e "[${LIGHT_RED}DELETED${STD}] ${current_key}=${current_value}"
+                echo -e "[${RED}DELETED${STD}] ${current_key}=${current_value}"
             fi
         fi
     done < "${OLD_FILE}"
