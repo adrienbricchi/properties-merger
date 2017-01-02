@@ -32,6 +32,7 @@ STD='\033[0m'
 
 TEST_MODE=false
 HELP=false
+APPEND_DELETED_VALUES=false
 
 while [[ $# -gt 0 ]]
 do
@@ -51,6 +52,9 @@ do
         ;;
         -t|--test)
             TEST_MODE=true
+        ;;
+        -a|--append-deleted-values)
+            APPEND_DELETED_VALUES=true
         ;;
         --no-color|--no-colour)
             GRAY=''
@@ -90,6 +94,10 @@ do
             echo -e "       ${BOLD}-t${STD}, ${BOLD}--test${STD}"
             echo -e "              The test mode, with emphasis on merged data."
             echo -e "              This mode will invalidate the -o option."
+            echo -e ""
+            echo -e "       ${BOLD}-a${STD}, ${BOLD}--append-deleted-values${STD}"
+            echo -e "              Adds the unknown keys from the input file at the end of the output."
+            echo -e "              This mode is activated automatically on test mode"
             echo -e ""
             echo -e "       ${BOLD}--no-color${STD}, ${BOLD}--no-colour${STD}"
             echo -e "              Disables colours on test mode."
@@ -152,6 +160,7 @@ fi
 if [[ $TEST_MODE == true ]];
 then
     unset OUTPUT_FILE
+    APPEND_DELETED_VALUES=true
 fi
 
 
@@ -188,7 +197,7 @@ do
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
         
-        if [[ $TEST_MODE == true ]]
+        if [[ $TEST_MODE == true ]];
         then
             if [[ -z ${old_value+x} ]];
             then
@@ -232,11 +241,10 @@ done < "${SAMPLE_FILE}"
 
 # Printing deleted values
 
-if [[ $TEST_MODE == true ]]
+if [[ $APPEND_DELETED_VALUES == true ]];
 then
     while read -r old_line
     do
-
         if [[ "${old_line}" =~ $PROPERTIES_REGEX ]];
         then
             current_key="${BASH_REMATCH[1]}"
@@ -253,7 +261,15 @@ then
 
             if [[ $key_exists_in_sample == false ]];
             then
-                echo -e "[${RED}DELETED${STD}] ${current_key}=${current_value}"
+                if [[ $TEST_MODE == true ]];
+                then
+                    echo -e "[${RED}DELETED${STD}] ${current_key}=${current_value}"
+                elif [[ -z ${OUTPUT_FILE+x} ]];
+                then
+                    echo "${current_key}=${current_value}"
+                else
+                    echo "${current_key}=${current_value}" >> $OUTPUT_FILE
+                fi
             fi
         fi
     done < "${OLD_FILE}"
