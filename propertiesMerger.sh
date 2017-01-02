@@ -17,7 +17,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION_NUMBER=2
+VERSION_NUMBER=3
 VERSION_DATE="2017/01/02"
 
 LIGHT_GREEN='\033[1;32m'
