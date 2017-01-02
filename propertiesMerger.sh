@@ -20,8 +20,9 @@
 VERSION_NUMBER=1
 VERSION_DATE="2016/12/23"
 
-GREEN='\033[1;32m'
+GRAY='\033[1;30m'
 RED='\033[1;31m'
+GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
 BOLD='\033[1m'
 STD='\033[0m'
@@ -52,8 +53,9 @@ do
             TEST_MODE=true
         ;;
         --no-color|--no-colour)
-            GREEN=''
+            GRAY=''
             RED=''
+            GREEN=''
             YELLOW=''
             BOLD=''
             STD=''
@@ -216,7 +218,7 @@ do
 
         if [[ $TEST_MODE == true ]]
         then
-            echo -e "[${BOLD}COMMENT${STD}] ${current_line}"
+            echo -e "[${GRAY}COMMENT${STD}] ${current_line}"
         elif [[ -z ${OUTPUT_FILE+x} ]];
         then
             echo "${current_line}"
