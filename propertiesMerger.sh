@@ -39,7 +39,7 @@ do
     key="$1"
     case $key in
         -i|--input)
-            OLD_FILE="$2"
+            INPUT_FILE="$2"
             shift
         ;;
         -s|--sample)
@@ -133,7 +133,7 @@ done
 
 # Safety checks
 
-if [[ ! -f $OLD_FILE ]];
+if [[ ! -f $INPUT_FILE ]];
 then
     echo -e "${RED}Error : Input file (--input) does not exist.${STD}"
     exit 2
@@ -181,31 +181,31 @@ do
 
         current_key="${BASH_REMATCH[1]}"
         current_value="${BASH_REMATCH[2]}"
-        unset old_value
+        unset input_value
 
         # Fetching old value
         # We're using the same Regex, to prevent old comments.
 
-        while read -r old_line
+        while read -r input_line
         do
-            if [[ "${old_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+            if [[ "${input_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
-                old_value="${BASH_REMATCH[2]}"
+                input_value="${BASH_REMATCH[2]}"
             fi
-        done < "${OLD_FILE}"
+        done < "${INPUT_FILE}"
 
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
         
         if [[ $TEST_MODE == true ]];
         then
-            if [[ -z ${old_value+x} ]];
+            if [[ -z ${input_value+x} ]];
             then
-                echo -e "[${YELLOW}SAMPLE${STD}]  ${current_key}=${current_value}"
+                echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}"
             else
-                echo -e "[${GREEN}INPUT${STD}]   ${current_key}=${old_value}"
+                echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}"
             fi
-        elif [[ -z ${old_value+x} ]];
+        elif [[ -z ${input_value+x} ]];
         then
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
@@ -216,9 +216,9 @@ do
         else
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
-                echo "${current_key}=${old_value}"
+                echo "${current_key}=${input_value}"
             else
-                echo "${current_key}=${old_value}" >> $OUTPUT_FILE
+                echo "${current_key}=${input_value}" >> $OUTPUT_FILE
             fi
         fi
 
@@ -243,9 +243,9 @@ done < "${SAMPLE_FILE}"
 
 if [[ $APPEND_DELETED_VALUES == true ]];
 then
-    while read -r old_line
+    while read -r input_line
     do
-        if [[ "${old_line}" =~ $PROPERTIES_REGEX ]];
+        if [[ "${input_line}" =~ $PROPERTIES_REGEX ]];
         then
             current_key="${BASH_REMATCH[1]}"
             current_value="${BASH_REMATCH[2]}"
@@ -272,6 +272,6 @@ then
                 fi
             fi
         fi
-    done < "${OLD_FILE}"
+    done < "${INPUT_FILE}"
 fi
 
