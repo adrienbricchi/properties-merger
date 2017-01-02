@@ -20,8 +20,9 @@
 VERSION_NUMBER=1
 VERSION_DATE="2016/12/23"
 
-YELLOW='\033[1;33m'
+LIGHT_GREEN='\033[1;32m'
 LIGHT_RED='\033[1;31m'
+YELLOW='\033[1;33m'
 LIGHT_GREY='\033[1;30m'
 BOLD='\033[1m'
 STD='\033[0m'
@@ -148,16 +149,6 @@ fi
 
 if [[ $TEST_MODE == true ]];
 then
-    echo -e "${LIGHT_GREY}################################################################################${STD}"
-    echo -e "${LIGHT_GREY}#                             TEST MODE                                        #${STD}"
-    echo -e "${LIGHT_GREY}#                                                                              #${STD}"
-    echo -e "${LIGHT_GREY}# This output contains a bunch of coloured chars,                              #${STD}"
-    echo -e "${LIGHT_GREY}# Avoid redirecting the output in a real .properties file.                     #${STD}"
-    echo -e "${LIGHT_GREY}#                                                                              #${STD}"
-    echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines${LIGHT_GREY} are parameters from the existing file                           #${STD}"
-    echo -e "${LIGHT_GREY}# ${STD}Regular lines${LIGHT_GREY} are parameters from the sample file                            #${STD}"
-    echo -e "${LIGHT_GREY}# ${LIGHT_RED}Red lines${LIGHT_GREY} are old parameters missing from the sample file                    #${STD}"
-    echo -e "${LIGHT_GREY}################################################################################${STD}"
     unset OUTPUT_FILE
 fi
 
@@ -195,7 +186,15 @@ do
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
         
-        if [[ -z ${old_value+x} ]];
+        if [[ $TEST_MODE == true ]]
+        then
+            if [[ -z ${old_value+x} ]];
+            then
+                echo -e "[${YELLOW}SAMPLE${STD}]  ${current_key}=${current_value}"
+            else
+                echo -e "[${LIGHT_GREEN}INPUT${STD}]   ${current_key}=${old_value}"
+            fi
+        elif [[ -z ${old_value+x} ]];
         then
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
@@ -203,9 +202,6 @@ do
             else
                 echo "${current_key}=${current_value}" >> $OUTPUT_FILE
             fi
-        elif [[ $TEST_MODE == true ]]
-        then
-            echo -e "${YELLOW}${current_key}=${old_value}${STD}"
         else
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
@@ -217,7 +213,11 @@ do
 
     else
         # Empty lines and comments are simply kept
-        if [[ -z ${OUTPUT_FILE+x} ]];
+
+        if [[ $TEST_MODE == true ]]
+        then
+            echo "[COMMENT] ${current_line}"
+        elif [[ -z ${OUTPUT_FILE+x} ]];
         then
             echo "${current_line}"
         else
@@ -251,7 +251,7 @@ then
 
             if [[ $key_exists_in_sample == false ]];
             then
-                echo -e "${LIGHT_RED}${current_key}=${current_value}${STD}"
+                echo -e "[${LIGHT_RED}DELETED${STD}] ${current_key}=${current_value}"
             fi
         fi
     done < "${OLD_FILE}"
