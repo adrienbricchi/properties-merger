@@ -156,6 +156,7 @@ then
     echo -e "${LIGHT_GREY}#                                                                              #${STD}"
     echo -e "${LIGHT_GREY}# ${YELLOW}Yellow lines${LIGHT_GREY} are parameters from the existing file                           #${STD}"
     echo -e "${LIGHT_GREY}# ${STD}Regular lines${LIGHT_GREY} are parameters from the sample file                            #${STD}"
+    echo -e "${LIGHT_GREY}# ${LIGHT_RED}Red lines${LIGHT_GREY} are old parameters missing from the sample file                    #${STD}"
     echo -e "${LIGHT_GREY}################################################################################${STD}"
     unset OUTPUT_FILE
 fi
@@ -163,16 +164,17 @@ fi
 
 # Merge files
 
+# Regex explain : ^\s*([^#]*?)=(.*?)\s*$
+# 
+#     ^\s*                Ignore spaces from the begining of line
+#     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
+#     (.*?)\s*$           Catches everything, til the end of line, "\s*" removes every final spaces
+# 
+PROPERTIES_REGEX="^\s*([^#]*?)=(.*?)\s*$"
+
 while read -r current_line
 do
-
-    # Regex explain : ^\s*([^#]*?)=(.*?)\s*$
-    # 
-    #     ^\s*                Ignore spaces from the begining of line
-    #     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
-    #     (.*?)\s*$           Catches everything, til the end of line, "\s*" removes every final spaces
-    # 
-    if [[ "${current_line}" =~ ^\s*([^#]*?)=(.*?)\s*$ ]];
+    if [[ "${current_line}" =~ $PROPERTIES_REGEX ]];
     then
 
         current_key="${BASH_REMATCH[1]}"
@@ -184,7 +186,7 @@ do
 
         while read -r old_line
         do
-            if [[ "${old_line}" =~ ^\s*([^#]*?)=(.*?)\s*$ ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+            if [[ "${old_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
                 old_value="${BASH_REMATCH[2]}"
             fi
@@ -224,4 +226,34 @@ do
     fi
 
 done < "${SAMPLE_FILE}"
+
+
+# Printing deleted values
+
+if [[ $TEST_MODE == true ]]
+then
+    while read -r old_line
+    do
+
+        if [[ "${old_line}" =~ $PROPERTIES_REGEX ]];
+        then
+            current_key="${BASH_REMATCH[1]}"
+            current_value="${BASH_REMATCH[2]}"
+            key_exists_in_sample=false
+
+            while read -r sample_line
+            do
+                if [[ "${sample_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+                then
+                    key_exists_in_sample=true
+                fi
+            done < "${SAMPLE_FILE}"
+
+            if [[ $key_exists_in_sample == false ]];
+            then
+                echo -e "${LIGHT_RED}${current_key}=${current_value}${STD}"
+            fi
+        fi
+    done < "${OLD_FILE}"
+fi
 
