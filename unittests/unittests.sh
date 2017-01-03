@@ -34,4 +34,18 @@ testMergeOutputAppendDeletedValues() {
     `rm -f ./test-output-a.properties`
 }
 
+testErrors() {
+    out=`../propertiesMerger.sh -i input.properties -s sample.properties --unknown-argument`
+    assertEquals "Unknown arg" "$?" "1"
+    out=`../propertiesMerger.sh -i missing.properties -s sample.properties`
+    assertEquals "Missing input" "$?" "2"
+    out=`../propertiesMerger.sh -i input.properties -s missing.properties`
+    assertEquals "Missing sample" "$?" "3"
+    out=`../propertiesMerger.sh -i input.properties -s input.properties`
+    assertEquals "Incoherent input" "$?" "4"
+    out=`../propertiesMerger.sh -i input.properties -s sample.properties -o output.properties`
+    assertEquals "Output overwiting something" "$?" "5"
+}
+
+
 . shunit2-2.1.6/src/shunit2
