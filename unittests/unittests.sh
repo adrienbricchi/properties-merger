@@ -34,6 +34,20 @@ testMergeOutputAppendDeletedValues() {
     `rm -f ./test-output-a.properties`
 }
 
+testTestMode() {
+    expected=`cat ./output-test-mode.properties`
+    out=`../propertiesMerger.sh -i input.properties -s sample.properties --test -a --no-color`
+    assertEquals "Return code" "$?" "0"
+    assertEquals "${out}" "${expected}"
+}
+
+testMan() {
+    out=`../propertiesMerger.sh --help`
+    assertEquals "Help return code" "$?" "0"
+    out=`../propertiesMerger.sh --version`
+    assertEquals "Version return code" "$?" "0"
+}
+
 testErrors() {
     out=`../propertiesMerger.sh -i input.properties -s sample.properties --unknown-argument`
     assertEquals "Unknown arg" "$?" "1"

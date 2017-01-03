@@ -1,5 +1,6 @@
 
 language: bash
+sudo: false
 
 before_script:
     - cd ./unittests
