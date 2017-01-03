@@ -97,7 +97,7 @@ do
             echo -e ""
             echo -e "       ${BOLD}-a${STD}, ${BOLD}--append-deleted-values${STD}"
             echo -e "              Adds the unknown keys from the input file at the end of the output."
-            echo -e "              This mode is activated automatically on test mode"
+            echo -e "              This mode is activated automatically on test mode."
             echo -e ""
             echo -e "       ${BOLD}--no-color${STD}, ${BOLD}--no-colour${STD}"
             echo -e "              Disables colours on test mode."
