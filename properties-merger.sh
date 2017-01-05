@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # properties-merger
-# Copyright (C) 2016
+# Copyright (C) 2016-2017
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION_NUMBER=1
-VERSION_DATE="2016/12/23"
+VERSION_NUMBER=3
+VERSION_DATE="2017/01/02"
 
 GRAY='\033[1;30m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
-YELLOW='\033[1;33m'
+YELLOW='\033[1;34m'
 BOLD='\033[1m'
 STD='\033[0m'
 
@@ -202,6 +202,9 @@ do
             if [[ -z ${input_value+x} ]];
             then
                 echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}"
+            elif [[ $input_value == $current_value ]]
+            then
+                echo -e "[${GRAY}SAME   ${STD}] ${current_key}=${current_value}"
             else
                 echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}"
             fi
