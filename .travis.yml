@@ -1,6 +1,10 @@
 
 language: bash
 sudo: false
+notifications:
+    email:
+        on_success: never
+        on_failure: never
 
 before_script:
     - cd ./unittests

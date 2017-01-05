@@ -23,7 +23,7 @@ VERSION_DATE="2017/01/05"
 GRAY='\033[1;30m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
-YELLOW='\033[1;33m'
+YELLOW='\033[1;34m'
 BOLD='\033[1m'
 STD='\033[0m'
 
@@ -166,6 +166,12 @@ fi
 
 # Merge files
 
+# Here we reverse the input file into a temp one (with tac)
+# To get the last value directly, and break the loop as earlier.
+# We append the date in ms to avoid 
+TMP_REVERSE_INPUT="/tmp/.properties-merger.$(date +%s%N)-${RANDOM}.tmp"
+tac $INPUT_FILE > $TMP_REVERSE_INPUT
+
 # Regex explain : ^\s*([^#]*?)=(.*?)\s*$
 # 
 #     ^\s*                Ignore spaces from the begining of line
@@ -184,15 +190,15 @@ do
         unset input_value
 
         # Fetching old value
-        # We're using the same Regex, to prevent old comments.
 
         while read -r input_line
         do
             if [[ "${input_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
                 input_value="${BASH_REMATCH[2]}"
+                break
             fi
-        done < "${INPUT_FILE}"
+        done < "${TMP_REVERSE_INPUT}"
 
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
@@ -202,6 +208,9 @@ do
             if [[ -z ${input_value+x} ]];
             then
                 echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}"
+            elif [[ $input_value == $current_value ]]
+            then
+                echo -e "[${GRAY}SAME   ${STD}] ${current_key}=${current_value}"
             else
                 echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}"
             fi
@@ -274,4 +283,6 @@ then
         fi
     done < "${INPUT_FILE}"
 fi
+
+rm $TMP_REVERSE_INPUT
 
