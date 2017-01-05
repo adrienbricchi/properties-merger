@@ -33,14 +33,14 @@ value.3=default value
 ## Installation
 
 ```
-# wget https://raw.githubusercontent.com/adrienbricchi/properties-merger/master/propertiesMerger.sh
+# wget https://raw.githubusercontent.com/adrienbricchi/properties-merger/master/properties-merger.sh
 ```
 
 ## Code Example
 
 First, you may run the test, to see which properties will be restored from the input file :
 ```
-# ./propertiesMerger.sh --input old.properties --sample sample.properties --test
+# ./properties-merger.sh --input old.properties --sample sample.properties --test
 ```
 >```
 [COMMENT] # Properties for v3
@@ -52,18 +52,18 @@ First, you may run the test, to see which properties will be restored from the i
 
 If the results suits you, you can write it in an output file, using a direct output :
 ```
-# ./propertiesMerger.sh -i old.properties -s sample.properties -o output.properties
+# ./properties-merger.sh -i old.properties -s sample.properties -o output.properties
 ```
 
 Unset output will echo-ing the result directly. You may want to redirect the output yourself.  
 Additionnally, we're going to keep the input file's deleted values here :
 ```
-# ./propertiesMerger.sh -i old.properties -s sample.properties --append-deleted-values
+# ./properties-merger.sh -i old.properties -s sample.properties --append-deleted-values
 ```
 
 For any other option :   
 ```
-# ./propertiesMerger.sh --help
+# ./properties-merger.sh --help
 ```
 
 ## License
