@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/adrienbricchi/properties-merger.svg?branch=master)](https://travis-ci.org/adrienbricchi/properties-merger)
 
-A Shell script to merge a sample .properties file with an old one, merging existing values.
+A Shell script to merge some old .properties file values with a sample one.
 
 ## Synopsis
 
@@ -18,7 +18,7 @@ value.3=default value
 ```shell
 # Properties for v2
 value.2=bar
-value.1=foo
+value.1=default value
 value.old=plop
 ```
 
@@ -45,7 +45,7 @@ First, you may run the test, to see which properties will be restored from the i
 >```
 [COMMENT] # Properties for v3
 [INPUT  ] value.1=foo
-[INPUT  ] value.2=bar
+[SAME   ] value.2=default value
 [SAMPLE ] value.3=default value
 [DELETED] value.old=plop
 ```
@@ -56,7 +56,7 @@ If the results suits you, you can write it in an output file, using a direct out
 ```
 
 Unset output will echo-ing the result directly. You may want to redirect the output yourself.  
-Let's keep the input file's deleted value in the output :
+Additionnally, we're going to keep the input file's deleted values here :
 ```
 # ./propertiesMerger.sh -i old.properties -s sample.properties --append-deleted-values
 ```
