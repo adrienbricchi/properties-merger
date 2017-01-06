@@ -27,7 +27,6 @@ YELLOW='\033[1;34m'
 BOLD='\033[1m'
 STD='\033[0m'
 
-
 # Parse input
 
 TEST_MODE=false
@@ -172,15 +171,17 @@ fi
 TMP_REVERSE_INPUT="/tmp/.properties-merger.$(date +%s%N)-${RANDOM}.tmp"
 tac $INPUT_FILE > $TMP_REVERSE_INPUT
 
-# Regex explain : ^\s*([^#]*?)=(.*?)\s*$
+# Regex explain : ^\s*([^#]*?)=(.*)$
 # 
 #     ^\s*                Ignore spaces from the begining of line
 #     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
-#     (.*?)\s*$           Catches everything, til the end of line, "\s*" removes every final spaces
+#     (.*)$               Catches everything, til the end of line
 # 
-PROPERTIES_REGEX="^\s*([^#]*?)=(.*?)\s*$"
+PROPERTIES_REGEX="^\s*([^#]*?)=(.*)$"
 
-while read -r current_line
+# The read command trims leading and trailing spaces?
+# The IFS value is cleared here to prevent that.
+while IFS= read -r current_line
 do
     if [[ "${current_line}" =~ $PROPERTIES_REGEX ]];
     then
@@ -191,7 +192,7 @@ do
 
         # Fetching old value
 
-        while read -r input_line
+        while IFS= read -r input_line
         do
             if [[ "${input_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
             then
@@ -202,17 +203,17 @@ do
 
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
-        
+         
         if [[ $TEST_MODE == true ]];
         then
             if [[ -z ${input_value+x} ]];
             then
-                echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}"
+                echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}¶"
             elif [[ $input_value == $current_value ]]
             then
-                echo -e "[${GRAY}SAME   ${STD}] ${current_key}=${current_value}"
+                echo -e "[${GRAY}SAME   ${STD}] ${current_key}=${current_value}¶"
             else
-                echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}"
+                echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}¶"
             fi
         elif [[ -z ${input_value+x} ]];
         then
@@ -252,7 +253,7 @@ done < "${SAMPLE_FILE}"
 
 if [[ $APPEND_DELETED_VALUES == true ]];
 then
-    while read -r input_line
+    while IFS= read -r input_line
     do
         if [[ "${input_line}" =~ $PROPERTIES_REGEX ]];
         then
@@ -260,7 +261,7 @@ then
             current_value="${BASH_REMATCH[2]}"
             key_exists_in_sample=false
 
-            while read -r sample_line
+            while IFS= read -r sample_line
             do
                 if [[ "${sample_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
                 then
@@ -272,7 +273,7 @@ then
             then
                 if [[ $TEST_MODE == true ]];
                 then
-                    echo -e "[${RED}DELETED${STD}] ${current_key}=${current_value}"
+                    echo -e "[${RED}DELETED${STD}] ${current_key}=${current_value}¶"
                 elif [[ -z ${OUTPUT_FILE+x} ]];
                 then
                     echo "${current_key}=${current_value}"

@@ -19,7 +19,7 @@ value.3=default value
 # Properties for v2
 value.2=bar
 value.1=default value
-value.old=plop
+value.old=plop 
 ```
 
 What we want, is the new model, keeping already existing values, in a new file :
@@ -44,10 +44,10 @@ First, you may run the test, to see which properties will be restored from the i
 ```
 >```
 [COMMENT] # Properties for v3
-[INPUT  ] value.1=foo
-[SAME   ] value.2=default value
-[SAMPLE ] value.3=default value
-[DELETED] value.old=plop
+[INPUT  ] value.1=foo¶
+[SAME   ] value.2=default value¶
+[SAMPLE ] value.3=default value¶
+[DELETED] value.old=plop ¶
 ```
 
 If the results suits you, you can write it in an output file, using a direct output :
