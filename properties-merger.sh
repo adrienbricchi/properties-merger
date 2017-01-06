@@ -17,8 +17,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-VERSION_NUMBER=4
-VERSION_DATE="2017/01/05"
+VERSION_NUMBER=5
+VERSION_DATE="2017/01/06"
 
 GRAY='\033[1;30m'
 RED='\033[1;31m'
