@@ -36,7 +36,7 @@ APPEND_DELETED_VALUES=false
 while [[ $# -gt 0 ]]
 do
     key="$1"
-    case $key in
+    case ${key} in
         -i|--input)
             INPUT_FILE="$2"
             shift
@@ -64,7 +64,7 @@ do
             STD=''
         ;;
         -v|--version)
-            echo $VERSION_NUMBER
+            echo ${VERSION_NUMBER}
             exit 0
         ;;
         -h|--help)
@@ -132,31 +132,31 @@ done
 
 # Safety checks
 
-if [[ ! -f $INPUT_FILE ]];
+if [[ ! -f ${INPUT_FILE} ]];
 then
     echo -e "${RED}Error : Input file (--input) does not exist.${STD}"
     exit 2
 fi
 
-if [[ ! -f $SAMPLE_FILE ]];
+if [[ ! -f ${SAMPLE_FILE} ]];
 then
     echo -e "${RED}Error : Sample file (--sample) does not exist.${STD}"
     exit 3
 fi
 
-if [[ $INPUT_FILE == $SAMPLE_FILE ]];
+if [[ ${INPUT_FILE} == ${SAMPLE_FILE} ]];
 then
     echo -e "${RED}Error : Input and Sample files are the same. This is probably not what you want.${STD}"
     exit 4
 fi
 
-if [[ -f $OUTPUT_FILE ]];
+if [[ -f ${OUTPUT_FILE} ]];
 then
     echo -e "${RED}Error : Output file already exists.${STD}"
     exit 5
 fi
 
-if [[ $TEST_MODE == true ]];
+if [[ ${TEST_MODE} == true ]];
 then
     unset OUTPUT_FILE
     APPEND_DELETED_VALUES=true
@@ -169,7 +169,7 @@ fi
 # To get the last value directly, and break the loop as earlier.
 # We append the date in ms to avoid 
 TMP_REVERSE_INPUT="/tmp/.properties-merger.$(date +%s%N)-${RANDOM}.tmp"
-tac $INPUT_FILE > $TMP_REVERSE_INPUT
+tac ${INPUT_FILE} > ${TMP_REVERSE_INPUT}
 
 # Regex explain : ^\s*([^#]*?)=(.*)$
 # 
@@ -177,7 +177,7 @@ tac $INPUT_FILE > $TMP_REVERSE_INPUT
 #     ([^#]*?)=           Catches non-# chars until the first "=" (non greedy),
 #     (.*)$               Catches everything, til the end of line
 # 
-PROPERTIES_REGEX="^\s*([^#]*?)=(.*)$"
+PROPERTIES_REGEX="^\s*([^#|=]*)=(.*)$"
 
 # The read command trims leading and trailing spaces?
 # The IFS value is cleared here to prevent that.
@@ -194,7 +194,7 @@ do
 
         while IFS= read -r input_line
         do
-            if [[ "${input_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+            if [[ "${input_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == ${current_key} ]];
             then
                 input_value="${BASH_REMATCH[2]}"
                 break
@@ -204,12 +204,12 @@ do
         # Printing result
         # Checking if old value is set, to keep existing empty values ("")
          
-        if [[ $TEST_MODE == true ]];
+        if [[ ${TEST_MODE} == true ]];
         then
             if [[ -z ${input_value+x} ]];
             then
                 echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}¶"
-            elif [[ $input_value == $current_value ]]
+            elif [[ ${input_value} == ${current_value} ]]
             then
                 echo -e "[${GRAY}SAME   ${STD}] ${current_key}=${current_value}¶"
             else
@@ -221,28 +221,28 @@ do
             then
                 echo "${current_key}=${current_value}"
             else
-                echo "${current_key}=${current_value}" >> $OUTPUT_FILE
+                echo "${current_key}=${current_value}" >> ${OUTPUT_FILE}
             fi
         else
             if [[ -z ${OUTPUT_FILE+x} ]];
             then
                 echo "${current_key}=${input_value}"
             else
-                echo "${current_key}=${input_value}" >> $OUTPUT_FILE
+                echo "${current_key}=${input_value}" >> ${OUTPUT_FILE}
             fi
         fi
 
     else
         # Empty lines and comments are simply kept
 
-        if [[ $TEST_MODE == true ]]
+        if [[ ${TEST_MODE} == true ]]
         then
             echo -e "[${GRAY}COMMENT${STD}] ${current_line}"
         elif [[ -z ${OUTPUT_FILE+x} ]];
         then
             echo "${current_line}"
         else
-            echo "${current_line}" >> $OUTPUT_FILE
+            echo "${current_line}" >> ${OUTPUT_FILE}
         fi
     fi
 
@@ -251,7 +251,7 @@ done < "${SAMPLE_FILE}"
 
 # Printing deleted values
 
-if [[ $APPEND_DELETED_VALUES == true ]];
+if [[ ${APPEND_DELETED_VALUES} == true ]];
 then
     while IFS= read -r input_line
     do
@@ -263,27 +263,27 @@ then
 
             while IFS= read -r sample_line
             do
-                if [[ "${sample_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == $current_key ]];
+                if [[ "${sample_line}" =~ $PROPERTIES_REGEX ]] && [[ "${BASH_REMATCH[1]}" == ${current_key} ]];
                 then
                     key_exists_in_sample=true
                 fi
             done < "${SAMPLE_FILE}"
 
-            if [[ $key_exists_in_sample == false ]];
+            if [[ ${key_exists_in_sample} == false ]];
             then
-                if [[ $TEST_MODE == true ]];
+                if [[ ${TEST_MODE} == true ]];
                 then
                     echo -e "[${RED}DELETED${STD}] ${current_key}=${current_value}¶"
                 elif [[ -z ${OUTPUT_FILE+x} ]];
                 then
                     echo "${current_key}=${current_value}"
                 else
-                    echo "${current_key}=${current_value}" >> $OUTPUT_FILE
+                    echo "${current_key}=${current_value}" >> ${OUTPUT_FILE}
                 fi
             fi
         fi
     done < "${INPUT_FILE}"
 fi
 
-rm $TMP_REVERSE_INPUT
+rm ${TMP_REVERSE_INPUT}
 
