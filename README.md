@@ -42,7 +42,7 @@ First, you may run the test, to see which properties will be restored from the i
 ```
 # ./properties-merger.sh --input old.properties --sample sample.properties --test
 ```
->```
+```
 [COMMENT] # Properties for v3
 [INPUT  ] value.1=foo¶
 [SAME   ] value.2=default value¶
