@@ -208,12 +208,12 @@ do
         then
             if [[ -z ${input_value+x} ]];
             then
-                echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}¶"
+                echo -e "[${GREEN}SAMPLE ${STD}] ${current_key}=${current_value}¶"
             elif [[ ${input_value} == ${current_value} ]]
             then
                 echo -e "[${GRAY}SAME   ${STD}] ${current_key}=${current_value}¶"
             else
-                echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}¶"
+                echo -e "[${YELLOW}INPUT  ${STD}] ${current_key}=${input_value}¶"
             fi
         elif [[ -z ${input_value+x} ]];
         then
