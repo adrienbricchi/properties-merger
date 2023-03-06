@@ -1,7 +1,8 @@
 #!/bin/bash
 
+#
 # properties-merger
-# Copyright (C) 2016-2017
+# Copyright (C) 2016-2023
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,10 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-
-VERSION_NUMBER=3
-VERSION_DATE="2017/01/02"
+VERSION_NUMBER=4
+VERSION_DATE="2023/03/07"
 
 GRAY='\033[1;30m'
 RED='\033[1;31m'
