@@ -1,24 +1,12 @@
 #!/bin/bash
 
-# properties-merger
-# Copyright (C) 2016-2017
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Copyright (c) Adrien BRICCHI and contributors. All rights reserved.
+# Licensed under the MIT license. See LICENSE.md file in the project root for details.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-VERSION_NUMBER=6
-VERSION_DATE="2017/02/17"
+VERSION_NUMBER=7
+VERSION_DATE="2023/03/08"
 
 GRAY='\033[1;30m'
 RED='\033[1;31m'
@@ -111,7 +99,7 @@ do
             echo -e "       Written by Adrien Bricchi"
             echo -e ""
             echo -e "${BOLD}COPYRIGHT${STD}"
-            echo -e "       Copyright © 2017 Libriciel.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>."
+            echo -e "       Copyright © 2016 Adrien BRICCHI.  License MIT"
             echo -e "       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law."
             echo -e ""
             echo -e "${BOLD}VERSION${STD}"
@@ -208,12 +196,12 @@ do
         then
             if [[ -z ${input_value+x} ]];
             then
-                echo -e "[${YELLOW}SAMPLE ${STD}] ${current_key}=${current_value}¶"
+                echo -e "[${GREEN}SAMPLE ${STD}] ${current_key}=${current_value}¶"
             elif [[ ${input_value} == ${current_value} ]]
             then
                 echo -e "[${GRAY}SAME   ${STD}] ${current_key}=${current_value}¶"
             else
-                echo -e "[${GREEN}INPUT  ${STD}] ${current_key}=${input_value}¶"
+                echo -e "[${YELLOW}INPUT  ${STD}] ${current_key}=${input_value}¶"
             fi
         elif [[ -z ${input_value+x} ]];
         then
