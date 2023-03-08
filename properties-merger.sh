@@ -99,7 +99,7 @@ do
             echo -e "       Written by Adrien Bricchi"
             echo -e ""
             echo -e "${BOLD}COPYRIGHT${STD}"
-            echo -e "       Copyright © 2017 Libriciel.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>."
+            echo -e "       Copyright © 2016 Adrien BRICCHI.  License MIT"
             echo -e "       This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law."
             echo -e ""
             echo -e "${BOLD}VERSION${STD}"
