@@ -1,5 +1,11 @@
 #!/bin/sh
 
+#
+# Copyright (c) Adrien BRICCHI and contributors. All rights reserved.
+# Licensed under the MIT license. See LICENSE.md file in the project root for details.
+#
+
+
 testMergeEcho() {
     expected=`cat ./output.properties`
     out=`../properties-merger.sh --input ./input.properties --sample ./sample.properties`
